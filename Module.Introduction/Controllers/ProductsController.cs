@@ -1,27 +1,33 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
+﻿using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 using Module.Introduction.Models;
-
 namespace Module.Introduction.Controllers
 {
     public class ProductsController : Controller
     {
         private readonly NorthwindContext _context;
 
-        public ProductsController(NorthwindContext context)
+        private IConfiguration Configuration { get; }
+
+        public ProductsController(NorthwindContext context, IConfiguration configuration)
         {
             _context = context;
+            Configuration = configuration;
         }
 
         // GET: Products
         public async Task<IActionResult> Index()
         {
-            var northwindContext = _context.Products.Include(p => p.Category).Include(p => p.Supplier);
+            var numberOfProducts = Configuration.GetValue<int>("NumberOfProducts");
+
+            var northwindContext = numberOfProducts == 0 ?
+                _context.Products.Include(p => p.Category).Include(p => p.Supplier) :
+                _context.Products.Include(p => p.Category).Include(p => p.Supplier).Take(numberOfProducts);
+           
             return View(await northwindContext.ToListAsync());
         }
 
