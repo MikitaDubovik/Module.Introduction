@@ -12,12 +12,14 @@ namespace Module.Introduction
 {
     public class Startup
     {
-        public Startup(IConfiguration configuration)
+        public IConfiguration Configuration { get; }
+        public ILoggerFactory LoggerFactory { get; }
+
+        public Startup(IConfiguration configuration, ILoggerFactory loggerFactory)
         {
             Configuration = configuration;
+            LoggerFactory = loggerFactory;
         }
-
-        public IConfiguration Configuration { get; }
 
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
@@ -29,26 +31,30 @@ namespace Module.Introduction
                 options.MinimumSameSitePolicy = SameSiteMode.None;
             });
 
-
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
 
+            var connectionString = Configuration.GetConnectionString("NorthwindContext");
+            LoggerFactory.AddFile("Logs/ConnectionString.txt");
+            var logger = LoggerFactory.CreateLogger("Startup");
+
+            logger.LogInformation($"ConnectionString = {connectionString}");
             services.AddDbContext<NorthwindContext>(options => 
-                options.UseSqlServer(Configuration.GetConnectionString("NorthwindContext")));
+                options.UseSqlServer(connectionString));
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IHostingEnvironment env, ILoggerFactory loggerFactory)
+        public void Configure(IApplicationBuilder app, IHostingEnvironment env)
         {
-            if (env.IsDevelopment())
-            {
-                app.UseDeveloperExceptionPage();
-            }
-            else
-            {
+            //if (env.IsDevelopment())
+            //{
+            //    app.UseDeveloperExceptionPage();
+            //}
+            //else
+            //{
                 app.UseExceptionHandler("/Home/Error");
                 // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
                 app.UseHsts();
-            }
+            //}
 
             app.UseHttpsRedirection();
             app.UseStaticFiles();
