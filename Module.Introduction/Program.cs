@@ -1,6 +1,7 @@
 ﻿using System.IO;
 using Microsoft.AspNetCore;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 
@@ -24,6 +25,12 @@ namespace Module.Introduction
 
         public static IWebHostBuilder CreateWebHostBuilder(string[] args) =>
             WebHost.CreateDefaultBuilder(args)
+                .ConfigureAppConfiguration((hostingContext, config) =>
+                {
+                    config.AddJsonFile("appsettings.Development.json",
+                        optional: false,        // File is not optional.
+                        reloadOnChange: false);
+                })
                 .UseStartup<Startup>();
     }
 }

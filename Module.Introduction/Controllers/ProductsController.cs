@@ -3,31 +3,31 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Options;
+using Module.Introduction.Infrastructure;
 using Module.Introduction.Models;
 namespace Module.Introduction.Controllers
 {
     public class ProductsController : Controller
     {
         private readonly NorthwindContext _context;
+        private readonly ApplicationSettings _settings;
 
-        private IConfiguration Configuration { get; }
-
-        public ProductsController(NorthwindContext context, IConfiguration configuration)
+        public ProductsController(NorthwindContext context, IOptions<ApplicationSettings> settingsOptions)
         {
             _context = context;
-            Configuration = configuration;
+            _settings = settingsOptions.Value;
         }
 
         // GET: Products
         public async Task<IActionResult> Index()
         {
-            var numberOfProducts = Configuration.GetValue<int>("NumberOfProducts");
+            var numberOfProducts = _settings.NumberOfProducts;
 
             var northwindContext = numberOfProducts == 0 ?
                 _context.Products.Include(p => p.Category).Include(p => p.Supplier) :
                 _context.Products.Include(p => p.Category).Include(p => p.Supplier).Take(numberOfProducts);
-           
+
             return View(await northwindContext.ToListAsync());
         }
 
@@ -132,7 +132,7 @@ namespace Module.Introduction.Controllers
             return View(products);
         }
 
-        // GET: Products/Delete/5
+        // GET: Products/DeleteAsync/5
         public async Task<IActionResult> Delete(int? id)
         {
             if (id == null)
@@ -152,8 +152,8 @@ namespace Module.Introduction.Controllers
             return View(products);
         }
 
-        // POST: Products/Delete/5
-        [HttpPost, ActionName("Delete")]
+        // POST: Products/DeleteAsync/5
+        [HttpPost, ActionName("DeleteAsync")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {

@@ -6,16 +6,19 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using Module.Introduction.Models;
+using Module.Introduction.Services;
 
 namespace Module.Introduction.Controllers
 {
     public class CategoriesController : Controller
     {
         private readonly NorthwindContext _context;
+        private readonly ICategoriesService _categoriesService;
 
-        public CategoriesController(NorthwindContext context)
+        public CategoriesController(NorthwindContext context, ICategoriesService categoriesService)
         {
             _context = context;
+            _categoriesService = categoriesService;
         }
 
         // GET: Categories
@@ -32,8 +35,8 @@ namespace Module.Introduction.Controllers
                 return NotFound();
             }
 
-            var categories = await _context.Categories
-                .FirstOrDefaultAsync(m => m.CategoryId == id);
+            var categories = await _categoriesService.GetDetailsAsync(id.Value);
+
             if (categories == null)
             {
                 return NotFound();
@@ -115,7 +118,7 @@ namespace Module.Introduction.Controllers
             return View(categories);
         }
 
-        // GET: Categories/Delete/5
+        // GET: Categories/DeleteAsync/5
         public async Task<IActionResult> Delete(int? id)
         {
             if (id == null)
@@ -133,8 +136,8 @@ namespace Module.Introduction.Controllers
             return View(categories);
         }
 
-        // POST: Categories/Delete/5
-        [HttpPost, ActionName("Delete")]
+        // POST: Categories/DeleteAsync/5
+        [HttpPost, ActionName("DeleteAsync")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {

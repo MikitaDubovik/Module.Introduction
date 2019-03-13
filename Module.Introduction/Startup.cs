@@ -6,7 +6,9 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using Module.Introduction.Infrastructure;
 using Module.Introduction.Models;
+using Module.Introduction.Services;
 
 namespace Module.Introduction
 {
@@ -40,6 +42,10 @@ namespace Module.Introduction
             logger.LogInformation($"ConnectionString = {connectionString}");
             services.AddDbContext<NorthwindContext>(options => 
                 options.UseSqlServer(connectionString));
+
+            services.Configure<ApplicationSettings>(Configuration);
+
+            services.AddScoped<ICategoriesService, CategoriesService>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -52,7 +58,7 @@ namespace Module.Introduction
             //else
             //{
                 app.UseExceptionHandler("/Home/Error");
-                // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
+                
                 app.UseHsts();
             //}
 
