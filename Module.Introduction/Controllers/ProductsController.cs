@@ -6,16 +6,20 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using Module.Introduction.Infrastructure;
 using Module.Introduction.Models;
+using Module.Introduction.Services;
+
 namespace Module.Introduction.Controllers
 {
     public class ProductsController : Controller
     {
         private readonly NorthwindContext _context;
         private readonly ApplicationSettings _settings;
+        private readonly IProductsService _productsService;
 
-        public ProductsController(NorthwindContext context, IOptions<ApplicationSettings> settingsOptions)
+        public ProductsController(NorthwindContext context, IOptions<ApplicationSettings> settingsOptions, IProductsService productsService)
         {
             _context = context;
+            _productsService = productsService;
             _settings = settingsOptions.Value;
         }
 
@@ -39,10 +43,7 @@ namespace Module.Introduction.Controllers
                 return NotFound();
             }
 
-            var products = await _context.Products
-                .Include(p => p.Category)
-                .Include(p => p.Supplier)
-                .FirstOrDefaultAsync(m => m.ProductId == id);
+            var products = await _productsService.GetDetailsAsync(id.Value);
             if (products == null)
             {
                 return NotFound();
