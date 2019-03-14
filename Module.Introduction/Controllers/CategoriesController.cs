@@ -1,5 +1,7 @@
-﻿using System.Linq;
+﻿using System.IO;
+using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Module.Introduction.Models;
@@ -53,10 +55,16 @@ namespace Module.Introduction.Controllers
         // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("CategoryId,CategoryName,Description,Picture")] Categories categories)
+        public async Task<IActionResult> Create([Bind("CategoryId,CategoryName,Description,Picture")] Categories categories, IFormFile file)
         {
             if (ModelState.IsValid)
             {
+                using (var memoryStream = new MemoryStream())
+                {
+                    await file.CopyToAsync(memoryStream);
+                    categories.Picture = memoryStream.ToArray();
+                }
+
                 _context.Add(categories);
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
@@ -85,17 +93,23 @@ namespace Module.Introduction.Controllers
         // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("CategoryId,CategoryName,Description,Picture")] Categories categories)
+        public async Task<IActionResult> Edit(int id, [Bind("CategoryId,CategoryName,Description,Picture")] Categories categories, IFormFile file)
         {
             if (id != categories.CategoryId)
             {
                 return NotFound();
             }
-
+           
             if (ModelState.IsValid)
             {
                 try
                 {
+                    using (var memoryStream = new MemoryStream())
+                    {
+                        await file.CopyToAsync(memoryStream);
+                        categories.Picture = memoryStream.ToArray();
+                    }
+
                     _context.Update(categories);
                     await _context.SaveChangesAsync();
                 }
