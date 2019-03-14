@@ -99,7 +99,7 @@ namespace Module.Introduction.Controllers
             {
                 return NotFound();
             }
-           
+
             if (ModelState.IsValid)
             {
                 try
@@ -156,6 +156,18 @@ namespace Module.Introduction.Controllers
             _context.Categories.Remove(categories);
             await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
+        }
+
+        [HttpGet, ActionName("GetFile")]
+        public async Task<IActionResult> GetFile(int id)
+        {
+            var categories = await _context.Categories.FindAsync(id);
+
+            using (var ms = new MemoryStream())
+            {
+                ms.Write(categories.Picture, 78, categories.Picture.Length - 78);
+                return File(ms.ToArray(), "image/jpeg");
+            }
         }
 
         private bool CategoriesExists(int id)

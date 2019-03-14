@@ -1,0 +1,8 @@
+﻿@model FileContentResult
+
+@{
+    ViewBag.Title = "title";
+    Layout = "_Layout";
+}
+
+<img src="@Url.Action("GetFile", "Categories", new { id = 1 })">
