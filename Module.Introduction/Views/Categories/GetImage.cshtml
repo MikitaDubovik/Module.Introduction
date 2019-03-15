@@ -1,0 +1,10 @@
+﻿@model int
+
+@{
+    ViewBag.Title = "title";
+    Layout = "_Layout";
+}
+
+<h1>Image from category number - @Model</h1>
+
+<img src="@Url.Action("GetFile", "Categories", new { id = Model })">

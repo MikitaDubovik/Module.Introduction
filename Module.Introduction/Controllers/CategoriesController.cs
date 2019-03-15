@@ -158,6 +158,12 @@ namespace Module.Introduction.Controllers
             return RedirectToAction(nameof(Index));
         }
 
+        [HttpGet, ActionName("GetImage")]
+        public async Task<IActionResult> GetImage(int id)
+        {
+            return View(id);
+        }
+
         [HttpGet, ActionName("GetFile")]
         public async Task<IActionResult> GetFile(int id)
         {
@@ -165,7 +171,15 @@ namespace Module.Introduction.Controllers
 
             using (var ms = new MemoryStream())
             {
-                ms.Write(categories.Picture, 78, categories.Picture.Length - 78);
+                if (categories.CategoryId < 9)
+                {
+                    ms.Write(categories.Picture, 78, categories.Picture.Length - 78);
+                }
+                else
+                {
+                    ms.Write(categories.Picture, 0, categories.Picture.Length);
+                }
+
                 return File(ms.ToArray(), "image/jpeg");
             }
         }
