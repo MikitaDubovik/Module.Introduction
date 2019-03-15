@@ -159,6 +159,8 @@ namespace Module.Introduction.Controllers
         }
 
         [HttpGet, ActionName("GetImage")]
+        [Route("[controller]/[action]/{id}")]
+        [Route("[controller]/image/{id}")]
         public async Task<IActionResult> GetImage(int id)
         {
             return View(id);
