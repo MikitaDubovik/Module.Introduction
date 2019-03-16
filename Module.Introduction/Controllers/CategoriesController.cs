@@ -6,9 +6,11 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Module.Introduction.Models;
 using Module.Introduction.Services;
+using Module.Introduction.Filters;
 
 namespace Module.Introduction.Controllers
 {
+    [TypeFilter(typeof(LoggerFilter))]
     public class CategoriesController : Controller
     {
         private readonly NorthwindContext _context;
@@ -158,6 +160,7 @@ namespace Module.Introduction.Controllers
             return RedirectToAction(nameof(Index));
         }
 
+        [ResponseCache(Duration = 60)]
         [HttpGet, ActionName("GetImage")]
         [Route("[controller]/[action]/{id}")]
         [Route("[controller]/image/{id}")]

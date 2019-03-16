@@ -40,7 +40,7 @@ namespace Module.Introduction
             var logger = LoggerFactory.CreateLogger("Startup");
 
             logger.LogInformation($"ConnectionString = {connectionString}");
-            services.AddDbContext<NorthwindContext>(options => 
+            services.AddDbContext<NorthwindContext>(options =>
                 options.UseSqlServer(connectionString));
 
             services.Configure<ApplicationSettings>(Configuration);
@@ -58,9 +58,9 @@ namespace Module.Introduction
             //}
             //else
             //{
-                app.UseExceptionHandler("/Home/Error");
-                
-                app.UseHsts();
+            app.UseExceptionHandler("/Home/Error");
+
+            app.UseHsts();
             //}
 
             app.UseHttpsRedirection();
