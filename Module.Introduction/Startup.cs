@@ -7,6 +7,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Module.Introduction.Infrastructure;
+using Module.Introduction.Middlewares;
 using Module.Introduction.Models;
 using Module.Introduction.Services;
 
@@ -66,6 +67,10 @@ namespace Module.Introduction
             app.UseHttpsRedirection();
             app.UseStaticFiles();
             app.UseCookiePolicy();
+
+            //app.Map("/Categories/GetImage/{id}", HandleMapTest1);
+            //app.Map("/Categories/image/{id}", HandleMapTest1);
+            app.UseMiddleware<CachedImagesMiddleware>();
 
             app.UseMvc(routes =>
             {
