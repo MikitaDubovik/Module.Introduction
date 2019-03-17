@@ -4,9 +4,9 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Module.Introduction.Filters;
 using Module.Introduction.Models;
 using Module.Introduction.Services;
-using Module.Introduction.Filters;
 
 namespace Module.Introduction.Controllers
 {
@@ -172,21 +172,8 @@ namespace Module.Introduction.Controllers
         [HttpGet, ActionName("GetFile")]
         public async Task<IActionResult> GetFile(int id)
         {
-            var categories = await _context.Categories.FindAsync(id);
-
-            using (var ms = new MemoryStream())
-            {
-                if (categories.CategoryId < 9)
-                {
-                    ms.Write(categories.Picture, 78, categories.Picture.Length - 78);
-                }
-                else
-                {
-                    ms.Write(categories.Picture, 0, categories.Picture.Length);
-                }
-
-                return File(ms.ToArray(), "image/jpeg");
-            }
+            var ms = await _categoriesService.GetImage(id);
+            return File(ms.ToArray(), "image/jpeg");
         }
 
         private bool CategoriesExists(int id)

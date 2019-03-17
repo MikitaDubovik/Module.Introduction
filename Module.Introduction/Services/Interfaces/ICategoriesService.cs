@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.IO;
 using System.Threading.Tasks;
 using Module.Introduction.Models;
 
@@ -15,5 +16,7 @@ namespace Module.Introduction.Services
         Task UpdateAsync(Categories categories);
 
         Task DeleteAsync(Categories categories);
+
+        Task<MemoryStream> GetImage(int id);
     }
 }

@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Options;
 using Module.Introduction.Infrastructure;
+using Module.Introduction.Services;
 
 namespace Module.Introduction.Middlewares
 {
@@ -14,69 +15,43 @@ namespace Module.Introduction.Middlewares
         private readonly ApplicationSettings _applicationSettings;
 
         private string _previousValue;
-        private readonly int _maximumNumberOfImage;
-        private int _currentNumberOfImage;
 
         private DateTime _previousTime;
         private readonly int _maximumPeriodBetweenRequest;
 
-        private readonly string _folderName = Directory.GetCurrentDirectory() + "CachedImages";
+        private const string FolderName = @"D:\Work\CachedImages";
 
         public CachedImagesMiddleware(RequestDelegate next, IOptions<ApplicationSettings> settingsOptions)
         {
             _next = next;
             _applicationSettings = settingsOptions.Value;
-            _maximumNumberOfImage = _applicationSettings.MaximumNumberOfImage;
             _maximumPeriodBetweenRequest = _applicationSettings.MaximumPeriodBetweenRequest;
         }
 
-        public async Task InvokeAsync(HttpContext context)
+        public async Task InvokeAsync(HttpContext context, IFilesService filesService)
         {
-            if (context.Request.Path.Value.Contains("Categories/GetImage") || context.Request.Path.Value.Contains("Categories/image"))
+            if (context.Request.Path.Value.Contains("Categories/GetImage") || context.Request.Path.Value.Contains("Categories/image") || context.Request.Path.Value.Contains("Categories/GetFile"))
             {
-                if (string.IsNullOrEmpty(_previousValue))
+                var currentTime = DateTime.Now;
+                if ((currentTime - _previousTime).Minutes > _maximumPeriodBetweenRequest)
                 {
-                    _previousValue = context.Request.Path.Value.Split('/').Last();
-                }
-                else
-                {
-                    var currentTime = DateTime.Now;
-                    if ((currentTime - _previousTime).Minutes > _maximumPeriodBetweenRequest)
+                    if (Directory.Exists(FolderName))
                     {
-                        if (Directory.Exists(_folderName))
-                        {
-                            Directory.Delete(_folderName, true);
-                        }
-
-                        _previousTime = currentTime;
-                        await _next(context);
+                        Directory.Delete(FolderName, true);
                     }
 
-                    if (_previousValue.Equals(context.Request.Path.Value.Split('/').Last()))
-                    {
-                        if (Directory.Exists(_folderName))
-                        {
-                            //Get cached image bu _curr
-                        }
-                    }
-                    else
-                    {
-                        //Most likely not here, but in CategoriesController
-                        if (_currentNumberOfImage == 0)
-                        {
-                            //Create cached image
-                            _currentNumberOfImage++;
-                        }
-                        if (_currentNumberOfImage == _maximumNumberOfImage)
-                        {
-                            _currentNumberOfImage = 1;
-                            //Create cached image
-                            _currentNumberOfImage++;
-                        }
-                    }
-
+                    _previousTime = currentTime;
                     await _next(context);
                 }
+
+                var id = int.Parse(context.Request.Path.Value.Split('/').Last());
+                var ms = filesService.Read(id);
+                if (ms != null)
+                {
+                    await context.Response.Body.WriteAsync(ms.GetBuffer(), 0, ms.GetBuffer().Length);
+                }
+
+                await _next(context);
             }
             else
             {
