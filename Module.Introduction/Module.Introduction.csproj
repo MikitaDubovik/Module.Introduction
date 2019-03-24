@@ -6,10 +6,12 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Content Remove="Views\Shared\Components\Breadcrumbs\Default.cshtml" />
     <Content Remove="Views\Shared\_LayoutHome.cshtml" />
   </ItemGroup>
 
   <ItemGroup>
+    <None Include="Views\Shared\Components\Breadcrumbs\Default.cshtml" />
     <None Include="Views\Shared\_LayoutHome.cshtml" />
   </ItemGroup>
 

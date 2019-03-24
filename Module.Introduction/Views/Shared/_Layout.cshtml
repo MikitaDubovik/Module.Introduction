@@ -1,4 +1,5 @@
-﻿<!DOCTYPE html>
+﻿@using Microsoft.AspNetCore.Http
+<!DOCTYPE html>
 <html>
 @if (!IsSectionDefined("head"))
 {
@@ -49,6 +50,12 @@
                     </div>
                 </div>
             </nav>
+            @if (!Context.Request.Path.Value.Split('/').Last().Equals("Home") && !Context.Request.Path.Value.Equals("/"))
+            {
+                <div>
+                    @await Component.InvokeAsync("Breadcrumbs", Context)
+                </div>
+            }
         </header>
         <div class="container">
             <partial name="_CookieConsentPartial" />
