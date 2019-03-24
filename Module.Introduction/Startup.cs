@@ -68,9 +68,7 @@ namespace Module.Introduction
             app.UseHttpsRedirection();
             app.UseStaticFiles();
             app.UseCookiePolicy();
-
-            //app.Map("/Categories/GetImage/{id}", HandleMapTest1);
-            //app.Map("/Categories/image/{id}", HandleMapTest1);
+            
             app.UseMiddleware<CachedImagesMiddleware>();
 
             app.UseMvc(routes =>
