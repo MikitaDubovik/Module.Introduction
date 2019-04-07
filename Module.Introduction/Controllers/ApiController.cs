@@ -112,8 +112,8 @@ namespace Module.Introduction.Controllers
             return File(ms.ToArray(), "image/jpeg");
         }
 
+        [Route("categories/image")]
         [HttpPost]
-        [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(int id, IFormFile file)
         {
             try

@@ -11,6 +11,7 @@ using Module.Introduction.Infrastructure;
 using Module.Introduction.Middlewares;
 using Module.Introduction.Models;
 using Module.Introduction.Services;
+using Swashbuckle.AspNetCore.Swagger;
 
 namespace Module.Introduction
 {
@@ -61,6 +62,11 @@ namespace Module.Introduction
             {
                 options.AddPolicy("SiteCorsPolicy", corsBuilder.Build());
             });
+
+            services.AddSwaggerGen(c =>
+            {
+                c.SwaggerDoc("v1", new Info { Title = "Module", Version = "v1" });
+            });
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -91,6 +97,13 @@ namespace Module.Introduction
             });
 
             app.UseCors("SiteCorsPolicy");
+
+            app.UseSwagger();
+
+            app.UseSwaggerUI(c =>
+            {
+                c.SwaggerEndpoint("/swagger/v1/swagger.json", "Module V1");
+            });
         }
     }
 }
