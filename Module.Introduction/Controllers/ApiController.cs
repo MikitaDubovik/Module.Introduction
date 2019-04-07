@@ -1,10 +1,13 @@
 ﻿using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Cors;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Module.Introduction.Models;
+using Module.Introduction.Services;
 
 namespace Module.Introduction.Controllers
 {
@@ -15,9 +18,12 @@ namespace Module.Introduction.Controllers
     {
         private readonly NorthwindContext _context;
 
-        public ApiController(NorthwindContext context)
+        private readonly ICategoriesService _categoriesService;
+
+        public ApiController(NorthwindContext context, ICategoriesService categoriesService)
         {
             _context = context;
+            _categoriesService = categoriesService;
         }
 
         // GET: api/Api
@@ -97,6 +103,38 @@ namespace Module.Introduction.Controllers
             await _context.SaveChangesAsync();
 
             return categories;
+        }
+
+        [HttpGet("categories/image/{id}")]
+        public async Task<IActionResult> GetImage(int id)
+        {
+            var ms = await _categoriesService.GetImage(id);
+            return File(ms.ToArray(), "image/jpeg");
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Edit(int id, IFormFile file)
+        {
+            try
+            {
+                var categories = _context.Categories.First(cat => cat.CategoryId == id);
+
+                using (var memoryStream = new MemoryStream())
+                {
+                    await file.CopyToAsync(memoryStream);
+                    categories.Picture = memoryStream.ToArray();
+                }
+
+                _context.Update(categories);
+                await _context.SaveChangesAsync();
+
+                return Ok();
+            }
+            catch (DbUpdateConcurrencyException)
+            {
+                return BadRequest();
+            }
         }
 
         // GET: api/Products1
