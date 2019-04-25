@@ -18,5 +18,7 @@ namespace Module.Introduction.Services
         Task DeleteAsync(Categories categories);
 
         Task<MemoryStream> GetImage(int id);
+
+        Task<Categories> GetAsync(int id);
     }
 }

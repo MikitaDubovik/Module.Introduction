@@ -3,7 +3,7 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 
 namespace Module.Introduction.Helpers
 {
-    public static class NorthwindImageLinkExrension
+    public static class NorthwindImageLinkExtension
     {
         public static IHtmlContent NorthwindImageLink(this IHtmlHelper helper, string id)
         {

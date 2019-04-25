@@ -11,6 +11,7 @@ using Module.Introduction.Infrastructure;
 using Module.Introduction.Middlewares;
 using Module.Introduction.Models;
 using Module.Introduction.Services;
+using Module.Introduction.Services.Interfaces;
 using Swashbuckle.AspNetCore.Swagger;
 
 namespace Module.Introduction
@@ -50,6 +51,7 @@ namespace Module.Introduction
 
             services.AddScoped<ICategoriesService, CategoriesService>();
             services.AddScoped<IProductsService, ProductsService>();
+            services.AddScoped<ISuppliersService, SuppliersService>();
             services.AddScoped<IFilesService, FilesService>();
 
             var corsBuilder = new CorsPolicyBuilder();
@@ -75,6 +77,13 @@ namespace Module.Introduction
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
+
+                app.UseSwagger();
+
+                app.UseSwaggerUI(c =>
+                {
+                    c.SwaggerEndpoint("/swagger/v1/swagger.json", "Module V1");
+                });
             }
             else
             {
@@ -86,7 +95,7 @@ namespace Module.Introduction
             app.UseHttpsRedirection();
             app.UseStaticFiles();
             app.UseCookiePolicy();
-            
+
             app.UseMiddleware<CachedImagesMiddleware>();
 
             app.UseMvc(routes =>
@@ -97,13 +106,6 @@ namespace Module.Introduction
             });
 
             app.UseCors("SiteCorsPolicy");
-
-            app.UseSwagger();
-
-            app.UseSwaggerUI(c =>
-            {
-                c.SwaggerEndpoint("/swagger/v1/swagger.json", "Module V1");
-            });
         }
     }
 }

@@ -15,5 +15,7 @@ namespace Module.Introduction.Services
         Task UpdateAsync(Products categories);
 
         Task DeleteAsync(Products categories);
+
+        Task<Products> GetAsync(int id);
     }
 }

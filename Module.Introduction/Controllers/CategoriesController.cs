@@ -13,19 +13,17 @@ namespace Module.Introduction.Controllers
     [TypeFilter(typeof(LoggerFilter))]
     public class CategoriesController : Controller
     {
-        private readonly NorthwindContext _context;
         private readonly ICategoriesService _categoriesService;
 
-        public CategoriesController(NorthwindContext context, ICategoriesService categoriesService)
+        public CategoriesController(ICategoriesService categoriesService)
         {
-            _context = context;
             _categoriesService = categoriesService;
         }
 
         // GET: Categories
         public async Task<IActionResult> Index()
         {
-            return View(await _context.Categories.ToListAsync());
+            return View(await _categoriesService.GetAllAsync());
         }
 
         // GET: Categories/Details/5
@@ -67,8 +65,8 @@ namespace Module.Introduction.Controllers
                     categories.Picture = memoryStream.ToArray();
                 }
 
-                _context.Add(categories);
-                await _context.SaveChangesAsync();
+                await _categoriesService.AddAsync(categories);
+
                 return RedirectToAction(nameof(Index));
             }
             return View(categories);
@@ -82,7 +80,7 @@ namespace Module.Introduction.Controllers
                 return NotFound();
             }
 
-            var categories = await _context.Categories.FindAsync(id);
+            var categories = await _categoriesService.GetAsync(id.Value);
             if (categories == null)
             {
                 return NotFound();
@@ -112,8 +110,7 @@ namespace Module.Introduction.Controllers
                         categories.Picture = memoryStream.ToArray();
                     }
 
-                    _context.Update(categories);
-                    await _context.SaveChangesAsync();
+                    await _categoriesService.UpdateAsync(categories);
                 }
                 catch (DbUpdateConcurrencyException)
                 {
@@ -139,8 +136,7 @@ namespace Module.Introduction.Controllers
                 return NotFound();
             }
 
-            var categories = await _context.Categories
-                .FirstOrDefaultAsync(m => m.CategoryId == id);
+            var categories = await _categoriesService.GetAsync(id.Value);
             if (categories == null)
             {
                 return NotFound();
@@ -154,9 +150,8 @@ namespace Module.Introduction.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            var categories = await _context.Categories.FindAsync(id);
-            _context.Categories.Remove(categories);
-            await _context.SaveChangesAsync();
+            var categories = await _categoriesService.GetAsync(id);
+            await _categoriesService.DeleteAsync(categories);
             return RedirectToAction(nameof(Index));
         }
 
@@ -178,7 +173,7 @@ namespace Module.Introduction.Controllers
 
         private bool CategoriesExists(int id)
         {
-            return _context.Categories.Any(e => e.CategoryId == id);
+            return _categoriesService.GetAllAsync().Result.Any(e => e.CategoryId == id);
         }
     }
 }
