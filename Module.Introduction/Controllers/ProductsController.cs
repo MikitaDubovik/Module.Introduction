@@ -16,11 +16,17 @@ namespace Module.Introduction.Controllers
         private readonly ApplicationSettings _settings;
         private readonly IProductsService _productsService;
         private readonly ISuppliersService _suppliersService;
+        private readonly ICategoriesService _categoriesService;
 
-        public ProductsController(IOptions<ApplicationSettings> settingsOptions, IProductsService productsService, ISuppliersService suppliersService)
+        public ProductsController(
+            IOptions<ApplicationSettings> settingsOptions,
+            IProductsService productsService,
+            ISuppliersService suppliersService,
+            ICategoriesService categoriesService)
         {
             _productsService = productsService;
             _suppliersService = suppliersService;
+            _categoriesService = categoriesService;
             _settings = settingsOptions.Value;
         }
 
@@ -28,12 +34,9 @@ namespace Module.Introduction.Controllers
         public async Task<IActionResult> Index()
         {
             var numberOfProducts = _settings.NumberOfProducts;
-            var products = await _productsService.GetAllAsync();
-            var northwindContext = numberOfProducts == 0 ?
-                products.AsQueryable().Include(p => p.Category).Include(p => p.Supplier).ToAsyncEnumerable() :
-                products.AsQueryable().Include(p => p.Category).Include(p => p.Supplier).Take(numberOfProducts).ToAsyncEnumerable();
+            var products = await _productsService.GetAllAsync(numberOfProducts);
 
-            return View(await northwindContext.ToList());
+            return View(products);
         }
 
         // GET: Products/Details/5
@@ -56,10 +59,10 @@ namespace Module.Introduction.Controllers
         // GET: Products/Create
         public async Task<IActionResult> Create()
         {
-            var products = await _productsService.GetAllAsync();
+            var categories = await _categoriesService.GetAllAsync();
             var supplierses = await _suppliersService.GetAllAsync();
 
-            ViewData["CategoryId"] = new SelectList(products, "CategoryId", "CategoryName");
+            ViewData["CategoryId"] = new SelectList(categories, "CategoryId", "CategoryName");
             ViewData["SupplierId"] = new SelectList(supplierses, "SupplierId", "CompanyName");
             return View();
         }
@@ -77,10 +80,10 @@ namespace Module.Introduction.Controllers
                 return RedirectToAction(nameof(Index));
             }
 
-            var productsTemp = await _productsService.GetAllAsync();
+            var categories = await _categoriesService.GetAllAsync();
             var suppliersesTemp = await _suppliersService.GetAllAsync();
 
-            ViewData["CategoryId"] = new SelectList(productsTemp, "CategoryId", "CategoryName", products.CategoryId);
+            ViewData["CategoryId"] = new SelectList(categories, "CategoryId", "CategoryName", products.CategoryId);
             ViewData["SupplierId"] = new SelectList(suppliersesTemp, "SupplierId", "CompanyName", products.SupplierId);
             return View(products);
         }
@@ -98,11 +101,11 @@ namespace Module.Introduction.Controllers
             {
                 return NotFound();
             }
-
-            var productsTemp = await _productsService.GetAllAsync();
+            
+            var categories = await _categoriesService.GetAllAsync();
             var suppliersesTemp = await _suppliersService.GetAllAsync();
 
-            ViewData["CategoryId"] = new SelectList(productsTemp, "CategoryId", "CategoryName", products.CategoryId);
+            ViewData["CategoryId"] = new SelectList(categories, "CategoryId", "CategoryName", products.CategoryId);
             ViewData["SupplierId"] = new SelectList(suppliersesTemp, "SupplierId", "CompanyName", products.SupplierId);
             return View(products);
         }
@@ -132,10 +135,10 @@ namespace Module.Introduction.Controllers
                 return RedirectToAction(nameof(Index));
             }
 
-            var productsTemp = await _productsService.GetAllAsync();
+            var categories = await _categoriesService.GetAllAsync();
             var suppliersesTemp = await _suppliersService.GetAllAsync();
 
-            ViewData["CategoryId"] = new SelectList(productsTemp, "CategoryId", "CategoryName", products.CategoryId);
+            ViewData["CategoryId"] = new SelectList(categories, "CategoryId", "CategoryName", products.CategoryId);
             ViewData["SupplierId"] = new SelectList(suppliersesTemp, "SupplierId", "CompanyName", products.SupplierId);
             return View(products);
         }

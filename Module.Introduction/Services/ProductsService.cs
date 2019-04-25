@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using Module.Introduction.Models;
@@ -48,6 +49,14 @@ namespace Module.Introduction.Services
         public async Task<Products> GetAsync(int id)
         {
             return await _context.Products.FirstOrDefaultAsync(pr => pr.ProductId == id);
+        }
+
+        public async Task<List<Products>> GetAllAsync(int numberOfProducts)
+        {
+            var northwindContext = numberOfProducts == 0 ?
+                _context.Products.Include(p => p.Category).Include(p => p.Supplier) :
+                _context.Products.Include(p => p.Category).Include(p => p.Supplier).Take(numberOfProducts);
+            return await northwindContext.ToListAsync();
         }
     }
 }

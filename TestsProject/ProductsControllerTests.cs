@@ -16,11 +16,12 @@ namespace TestsProject
         {
             var productsServiceMock = new Mock<IProductsService>();
             var suppliersService = new Mock<ISuppliersService>();
+            var categoriesService = new Mock<ICategoriesService>();
             var applicationSettingsMock = new Mock<IOptions<ApplicationSettings>>();
             productsServiceMock
                 .Setup(service => service.GetDetailsAsync(It.IsAny<int>()))
                 .ReturnsAsync(() => new Products { ProductName = "TestProducts" });
-            var categoriesController = new Module.Introduction.Controllers.ProductsController(applicationSettingsMock.Object, productsServiceMock.Object, suppliersService.Object);
+            var categoriesController = new Module.Introduction.Controllers.ProductsController(applicationSettingsMock.Object, productsServiceMock.Object, suppliersService.Object, categoriesService.Object);
             var result = await categoriesController.Details(1);
 
             Assert.IsNotNull(result);
