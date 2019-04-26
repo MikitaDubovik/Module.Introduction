@@ -1,6 +1,4 @@
 ﻿using System.Collections.Generic;
-using System.IO;
-using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Http;
@@ -23,15 +21,14 @@ namespace Module.Introduction.Controllers
             _categoriesService = categoriesService;
         }
 
-        // GET: api/Api
-        [Route("")]
+        // GET: api
         [HttpGet]
         public async Task<ActionResult<IEnumerable<Categories>>> GetCategories()
         {
             return await _categoriesService.GetAllAsync();
         }
 
-        // GET: api/Api/5
+        // GET: api/5
         [HttpGet("{id}")]
         public async Task<ActionResult<Categories>> GetCategories(int id)
         {
@@ -45,17 +42,16 @@ namespace Module.Introduction.Controllers
             return categories;
         }
 
-        // POST: api/Api
-        [Route("")]
+        // POST: api
         [HttpPost]
         public async Task<ActionResult<Categories>> PostCategories(Categories categories)
         {
-            _categoriesService.AddAsync(categories);
+            await _categoriesService.AddAsync(categories);
 
             return CreatedAtAction("GetCategories", new { id = categories.CategoryId }, categories);
         }
 
-        // DELETE: api/Api/5
+        // DELETE: api/5
         [HttpDelete("{id}")]
         public async Task<ActionResult<Categories>> DeleteCategories(int id)
         {
@@ -83,15 +79,7 @@ namespace Module.Introduction.Controllers
         {
             try
             {
-                var categories = await _categoriesService.GetAsync(id);
-
-                using (var memoryStream = new MemoryStream())
-                {
-                    await file.CopyToAsync(memoryStream);
-                    categories.Picture = memoryStream.ToArray();
-                }
-
-                await _categoriesService.UpdateAsync(categories);
+                await _categoriesService.UpdateAsync(id, file);
 
                 return Ok();
             }
@@ -99,11 +87,6 @@ namespace Module.Introduction.Controllers
             {
                 return BadRequest();
             }
-        }
-
-        private bool CategoriesExists(int id)
-        {
-            return _categoriesService.GetAllAsync().Result.Any(e => e.CategoryId == id);
         }
     }
 }

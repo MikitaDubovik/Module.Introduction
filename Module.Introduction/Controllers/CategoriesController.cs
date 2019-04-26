@@ -1,9 +1,7 @@
 ﻿using System.IO;
-using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 using Module.Introduction.Filters;
 using Module.Introduction.Models;
 using Module.Introduction.Services;
@@ -95,34 +93,21 @@ namespace Module.Introduction.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(int id, [Bind("CategoryId,CategoryName,Description,Picture")] Categories categories, IFormFile file)
         {
-            if (id != categories.CategoryId)
+            if (!CategoriesExists(categories.CategoryId))
             {
                 return NotFound();
             }
 
             if (ModelState.IsValid)
             {
-                try
+                using (var memoryStream = new MemoryStream())
                 {
-                    using (var memoryStream = new MemoryStream())
-                    {
-                        await file.CopyToAsync(memoryStream);
-                        categories.Picture = memoryStream.ToArray();
-                    }
+                    await file.CopyToAsync(memoryStream);
+                    categories.Picture = memoryStream.ToArray();
+                }
 
-                    await _categoriesService.UpdateAsync(categories);
-                }
-                catch (DbUpdateConcurrencyException)
-                {
-                    if (!CategoriesExists(categories.CategoryId))
-                    {
-                        return NotFound();
-                    }
-                    else
-                    {
-                        throw;
-                    }
-                }
+                await _categoriesService.UpdateAsync(categories);
+
                 return RedirectToAction(nameof(Index));
             }
             return View(categories);
@@ -173,7 +158,7 @@ namespace Module.Introduction.Controllers
 
         private bool CategoriesExists(int id)
         {
-            return _categoriesService.GetAllAsync().Result.Any(e => e.CategoryId == id);
+            return _categoriesService.GetAsync(id) != null;
         }
     }
 }

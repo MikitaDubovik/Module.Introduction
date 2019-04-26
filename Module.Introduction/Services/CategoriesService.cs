@@ -2,6 +2,7 @@
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using Module.Introduction.Infrastructure;
@@ -57,6 +58,19 @@ namespace Module.Introduction.Services
         {
             return await _context.Categories
                 .FirstOrDefaultAsync(m => m.CategoryId == id);
+        }
+
+        public async Task UpdateAsync(int id, IFormFile file)
+        {
+            var categories = await GetAsync(id);
+
+            using (var memoryStream = new MemoryStream())
+            {
+                await file.CopyToAsync(memoryStream);
+                categories.Picture = memoryStream.ToArray();
+            }
+
+            await UpdateAsync(categories);
         }
 
         public async Task<MemoryStream> GetImage(int id)

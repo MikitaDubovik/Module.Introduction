@@ -19,5 +19,7 @@ namespace Module.Introduction.Services
         Task<Products> GetAsync(int id);
 
         Task<List<Products>> GetAllAsync(int numberOfProducts);
+
+        Task<Products> GetWithRelatedEntitiesAsync(int id);
     }
 }

@@ -1,5 +1,4 @@
-﻿using System.Linq;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
@@ -101,7 +100,7 @@ namespace Module.Introduction.Controllers
             {
                 return NotFound();
             }
-            
+
             var categories = await _categoriesService.GetAllAsync();
             var suppliersesTemp = await _suppliersService.GetAllAsync();
 
@@ -151,10 +150,8 @@ namespace Module.Introduction.Controllers
                 return NotFound();
             }
 
-            var products = await _productsService.GetAllAsync().Result.AsQueryable()
-                .Include(p => p.Category)
-                .Include(p => p.Supplier)
-                .FirstOrDefaultAsync(m => m.ProductId == id);
+            var products = await _productsService.GetWithRelatedEntitiesAsync(id.Value);
+
             if (products == null)
             {
                 return NotFound();

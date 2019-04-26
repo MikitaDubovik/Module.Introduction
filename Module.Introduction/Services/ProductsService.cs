@@ -56,7 +56,16 @@ namespace Module.Introduction.Services
             var northwindContext = numberOfProducts == 0 ?
                 _context.Products.Include(p => p.Category).Include(p => p.Supplier) :
                 _context.Products.Include(p => p.Category).Include(p => p.Supplier).Take(numberOfProducts);
+
             return await northwindContext.ToListAsync();
+        }
+
+        public Task<Products> GetWithRelatedEntitiesAsync(int id)
+        {
+            return _context.Products
+                .Include(p => p.Category)
+                .Include(p => p.Supplier)
+                .FirstOrDefaultAsync(p => p.ProductId == id);
         }
     }
 }
