@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.IO;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Http;
 using Module.Introduction.Models;
 
 namespace Module.Introduction.Services
@@ -18,5 +19,9 @@ namespace Module.Introduction.Services
         Task DeleteAsync(Categories categories);
 
         Task<MemoryStream> GetImage(int id);
+
+        Task<Categories> GetAsync(int id);
+
+        Task UpdateAsync(int id, IFormFile file);
     }
 }

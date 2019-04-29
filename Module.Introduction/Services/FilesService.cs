@@ -10,35 +10,43 @@ namespace Module.Introduction.Services
     public class FilesService : IFilesService
     {
         private readonly ApplicationSettings _applicationSettings;
+        private readonly string _nameOfDirectory;
 
         public FilesService(IOptions<ApplicationSettings> settingsOptions)
         {
             _applicationSettings = settingsOptions.Value;
+            _nameOfDirectory = _applicationSettings.NameOfDirectory;
         }
 
         public async Task WriteAsync(Categories categories)
         {
-            if (!Directory.Exists(@"D:\Work\CachedImages"))
+            if (!Directory.Exists(_nameOfDirectory))
             {
-                Directory.CreateDirectory(@"D:\Work\CachedImages");
+                Directory.CreateDirectory(_nameOfDirectory);
                 await File.WriteAllBytesAsync(
-                    $@"D:\Work\CachedImages\CachedImage{categories.CategoryId}.txt",
+                    _nameOfDirectory + $@"\CachedImage{categories.CategoryId}.txt",
                     categories.Picture);
             }
             else
             {
-                var numberOfFiles = Directory.GetFiles(@"D:\Work\CachedImages").Length;
-                if (numberOfFiles < _applicationSettings.MaximumNumberOfImage)
+                var numberOfFiles = Directory.GetFiles(_nameOfDirectory).Length;
+                var maximumNumberOfImage = _applicationSettings.MaximumNumberOfImage;
+                if (maximumNumberOfImage < 1)
+                {
+                    maximumNumberOfImage = 2;
+                }
+
+                if (numberOfFiles < maximumNumberOfImage)
                 {
                     await File.WriteAllBytesAsync(
-                        $@"D:\Work\CachedImages\CachedImage{categories.CategoryId}.txt",
+                        _nameOfDirectory + $@"\CachedImage{categories.CategoryId}.txt",
                         categories.Picture);
                 }
                 else
                 {
-                    File.Delete(Directory.GetFiles($@"D:\Work\CachedImages").First());
+                    File.Delete(Directory.GetFiles(_nameOfDirectory).First());
                     await File.WriteAllBytesAsync(
-                        $@"D:\Work\CachedImages\CachedImage{categories.CategoryId}.txt",
+                        _nameOfDirectory + $@"\CachedImage{categories.CategoryId}.txt",
                         categories.Picture);
                 }
             }
@@ -47,16 +55,16 @@ namespace Module.Introduction.Services
 
         public MemoryStream Read(int id)
         {
-            if (!Directory.Exists(@"D:\Work\CachedImages")) return null;
+            if (!Directory.Exists(_nameOfDirectory)) return null;
 
-            var files = Directory.GetFiles(@"D:\Work\CachedImages");
-            if (files.Any(f => f.Contains($@"D:\Work\CachedImages\CachedImage{id}.txt")))
+            var files = Directory.GetFiles(_nameOfDirectory);
+            if (files.Any(f => f.Contains(_nameOfDirectory + $@"\CachedImage{id}.txt")))
             {
-                var imageBytes = File.ReadAllBytes($@"D:\Work\CachedImages\CachedImage{id}.txt");
+                var imageBytes = File.ReadAllBytes(_nameOfDirectory + $@"\CachedImage{id}.txt");
 
                 using (var ms = new MemoryStream())
                 {
-                    if (id < 9)
+                    if (id < _applicationSettings.IdOfBrokenImage)
                     {
                         ms.Write(imageBytes, 78, imageBytes.Length - 78);
                     }

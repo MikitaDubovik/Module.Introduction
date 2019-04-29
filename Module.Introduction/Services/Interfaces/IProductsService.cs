@@ -15,5 +15,11 @@ namespace Module.Introduction.Services
         Task UpdateAsync(Products categories);
 
         Task DeleteAsync(Products categories);
+
+        Task<Products> GetAsync(int id);
+
+        Task<List<Products>> GetAllAsync(int numberOfProducts);
+
+        Task<Products> GetWithRelatedEntitiesAsync(int id);
     }
 }
