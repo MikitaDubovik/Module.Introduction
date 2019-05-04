@@ -1,8 +1,7 @@
-﻿using System;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Metadata;
+﻿using Microsoft.EntityFrameworkCore;
+using Module.Introduction.Models;
 
-namespace Module.Introduction.Models
+namespace Module.Introduction.Contexts
 {
     public partial class NorthwindContext : DbContext
     {

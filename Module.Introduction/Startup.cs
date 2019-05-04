@@ -7,6 +7,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using Module.Introduction.Contexts;
 using Module.Introduction.Infrastructure;
 using Module.Introduction.Middlewares;
 using Module.Introduction.Models;
@@ -85,6 +86,7 @@ namespace Module.Introduction
 
             app.UseHttpsRedirection();
             app.UseStaticFiles();
+            app.UseAuthentication();
             app.UseCookiePolicy();
             
             app.UseMiddleware<CachedImagesMiddleware>();
