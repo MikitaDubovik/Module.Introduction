@@ -53,6 +53,7 @@ namespace Module.Introduction
             services.AddScoped<IProductsService, ProductsService>();
             services.AddScoped<ISuppliersService, SuppliersService>();
             services.AddScoped<IFilesService, FilesService>();
+            services.AddScoped<IAdministrationService, AdministrationService>();
 
             var corsBuilder = new CorsPolicyBuilder();
             corsBuilder.AllowAnyHeader();
@@ -95,6 +96,8 @@ namespace Module.Introduction
             app.UseHttpsRedirection();
             app.UseStaticFiles();
             app.UseCookiePolicy();
+
+            app.UseAuthentication();
 
             app.UseMiddleware<CachedImagesMiddleware>();
 
