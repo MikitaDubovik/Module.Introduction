@@ -3,20 +3,21 @@
   <PropertyGroup>
     <TargetFramework>netcoreapp2.2</TargetFramework>
     <AspNetCoreHostingModel>InProcess</AspNetCoreHostingModel>
+    <UserSecretsId>a88a2938-9b0b-4165-9b23-f2d844120f0c</UserSecretsId>
+    <CopyRefAssembliesToPublishDirectory>true</CopyRefAssembliesToPublishDirectory>
   </PropertyGroup>
 
   <ItemGroup>
     <Content Remove="Views\Shared\Components\Breadcrumbs\Default.cshtml" />
-    <Content Remove="Views\Shared\_LayoutHome.cshtml" />
   </ItemGroup>
 
   <ItemGroup>
     <None Include="Views\Shared\Components\Breadcrumbs\Default.cshtml" />
-    <None Include="Views\Shared\_LayoutHome.cshtml" />
   </ItemGroup>
 
 
   <ItemGroup>
+    <PackageReference Include="BuildBundlerMinifier" Version="2.9.406" />
     <PackageReference Include="Microsoft.AspNetCore.App" />
     <PackageReference Include="Microsoft.AspNetCore.Razor.Design" Version="2.2.0" PrivateAssets="All" />
     <PackageReference Include="Microsoft.EntityFrameworkCore" Version="2.2.4" />
