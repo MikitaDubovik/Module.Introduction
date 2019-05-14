@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -10,6 +11,7 @@ using Module.Introduction.Services;
 namespace Module.Introduction.Controllers
 {
     [EnableCors("SiteCorsPolicy")]
+    [Authorize]
     [Route("api/[controller]")]
     [ApiController]
     public class CategoriesApiController : ControllerBase
