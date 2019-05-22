@@ -1,4 +1,7 @@
-﻿using Microsoft.AspNetCore.Builder;
+﻿using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Authentication.OpenIdConnect;
+using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Cors.Infrastructure;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
@@ -53,6 +56,7 @@ namespace Module.Introduction
             services.AddScoped<IProductsService, ProductsService>();
             services.AddScoped<ISuppliersService, SuppliersService>();
             services.AddScoped<IFilesService, FilesService>();
+            services.AddScoped<IAdministrationService, AdministrationService>();
 
             var corsBuilder = new CorsPolicyBuilder();
             corsBuilder.AllowAnyHeader();
@@ -69,6 +73,14 @@ namespace Module.Introduction
             {
                 c.SwaggerDoc("v1", new Info { Title = "Module", Version = "v1" });
             });
+
+            services.AddAuthentication(sharedOptions =>
+                {
+                    sharedOptions.DefaultScheme = CookieAuthenticationDefaults.AuthenticationScheme;
+                    sharedOptions.DefaultChallengeScheme = OpenIdConnectDefaults.AuthenticationScheme;
+                })
+                .AddAzureAd(options => Configuration.Bind("AzureAd", options))
+                .AddCookie();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -95,6 +107,8 @@ namespace Module.Introduction
             app.UseHttpsRedirection();
             app.UseStaticFiles();
             app.UseCookiePolicy();
+
+            app.UseAuthentication();
 
             app.UseMiddleware<CachedImagesMiddleware>();
 
